@@ -1,0 +1,188 @@
+{
+  "name": "Telegram chatbot",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -448,
+        -48
+      ],
+      "id": "0c09b0d0-3179-46eb-9174-0cf340ffe942",
+      "name": "Telegram Trigger",
+      "webhookId": "7d58351b-1b84-4dfe-871c-ef6cff53d3f5",
+      "credentials": {
+        "telegramApi": {
+          "id": "aGJbySpB04yJw8Fa",
+          "name": "Telegram account 5"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message.text }}",
+        "options": {
+          "systemMessage": "You are a helpful assistant\ngive the best answers and be precise"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -224,
+        -48
+      ],
+      "id": "663b0158-9cc0-4888-908d-747a3dadbb95",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.message.chat.id }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -128,
+        192
+      ],
+      "id": "92a516c8-d305-4afa-814d-3dfc8d11910b",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolCalculator",
+      "typeVersion": 1,
+      "position": [
+        80,
+        208
+      ],
+      "id": "6362b177-d4c4-4e3e-bb9b-e30cf4cb99e4",
+      "name": "Calculator"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        160,
+        -32
+      ],
+      "id": "e1c47af3-457e-4988-be48-9a6e3f86bc77",
+      "name": "Send a text message",
+      "webhookId": "b1677e32-188e-457f-aec0-caa6f8344886",
+      "credentials": {
+        "telegramApi": {
+          "id": "aGJbySpB04yJw8Fa",
+          "name": "Telegram account 5"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-5-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -368,
+        208
+      ],
+      "id": "97cf316e-7704-4f4f-ac0e-0fd69a4e0c32",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "K726pK8MpuxfUFLC",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculator": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "0a89063e-c8df-4c7d-91e5-ef79718f1ad5",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "26f8cd5c17ba955f0416ad21b712a94afb443f5e18a1e16fe52585a43bb936fd"
+  },
+  "id": "Dquse08hZJwLKqo1",
+  "tags": []
+}
